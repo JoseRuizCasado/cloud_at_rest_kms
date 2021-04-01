@@ -1,7 +1,6 @@
-from cryptography.hazmat.primitives.ciphers.aead import AESCCM
+import requests
 
-key = AESCCM.generate_key(bit_length=256)
-print(key)
-with open('master_key.key', 'wb') as file:
-    file.write(key)  # The key is type bytes still
-    file.close()
+
+response = requests.get('http://127.0.0.1:8000/download-file/ejemplo.txt/Jose')
+
+print(response.content)
