@@ -1,7 +1,11 @@
+import base64
+import json
+
 import requests
 from cryptography.fernet import Fernet
 import click
 import os
+import pandas as pd
 
 
 server_address = 'http://127.0.0.1:8000'
@@ -16,16 +20,24 @@ def files():
 @click.argument('file', type=str, nargs=1)
 @click.argument('output_file', type=str, nargs=1)
 def encrypt_file(file, output_file):
-    with open('FernetKey.key', 'rb') as f_key:  # Open the file as wb to write bytes
-        key = f_key.read()  # The key is type bytes still
-
+    key = Fernet.generate_key()
     fernet_key = Fernet(key)
+
     with open(file, 'rb') as file_to_encrypt:
         content = file_to_encrypt.read()
 
     encrypted_content = fernet_key.encrypt(content)
+
+    response = requests.get('http://127.0.0.1:8081/wrapped-key/' + key.decode()).content.decode()
+    json_res = json.loads(response)
+    WDEK = json_res['DEK'].encode()
+
     with open(output_file, 'wb') as file_to_save:
         file_to_save.write(encrypted_content)
+
+    d = {'FILE': [output_file], 'DEK': [WDEK.decode()]}
+    df = pd.DataFrame(data=d)
+    df.to_csv('bd.csv', mode='a', header=False)
 
 
 @click.command(name='get_file')
