@@ -14,7 +14,7 @@ print(key)
 cipher = Cipher(algorithms.AES(key),modes.CCM(iv))
 encryptor = cipher.encryptor()
 
-uploaded_file = 'ejemplo.txt'
+uploaded_file = 'ejemplo-cli.txt'
 with open(uploaded_file, "rb") as source, open('encrypted.txt', 'wb+') as sink:
     byte = source.read(chunk_size)
     while byte:

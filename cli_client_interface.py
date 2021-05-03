@@ -1,6 +1,5 @@
 import base64
 import json
-
 import requests
 from cryptography.fernet import Fernet
 import click
@@ -18,26 +17,15 @@ def files():
 
 @click.command(name='encrypt-file')
 @click.argument('file', type=str, nargs=1)
-@click.argument('output_file', type=str, nargs=1)
-def encrypt_file(file, output_file):
-    key = Fernet.generate_key()
-    fernet_key = Fernet(key)
-
-    with open(file, 'rb') as file_to_encrypt:
-        content = file_to_encrypt.read()
-
-    encrypted_content = fernet_key.encrypt(content)
-
-    response = requests.get('http://127.0.0.1:8081/wrapped-key/' + key.decode()).content.decode()
-    json_res = json.loads(response)
-    WDEK = json_res['DEK'].encode()
-
-    with open(output_file, 'wb') as file_to_save:
-        file_to_save.write(encrypted_content)
-
-    d = {'FILE': [output_file], 'DEK': [WDEK.decode()]}
-    df = pd.DataFrame(data=d)
-    df.to_csv('bd.csv', mode='a', header=False)
+@click.argument('username', type=str, nargs=1)
+@click.password_option()
+def encrypt_file(file, username, password):
+    res = requests.get(f'{server_address}/api-login', data={'user': username, 'pass': password})
+    if res.status_code == 200:
+            res = requests.post(f'{server_address}/upload-file', files={'file': open(file, 'rb')})
+            print(res.status_code, res.text)
+    else:
+        print(res.status_code, res.content)
 
 
 @click.command(name='get_file')
