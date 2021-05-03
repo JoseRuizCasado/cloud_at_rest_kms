@@ -4,6 +4,9 @@ import click
 import os
 
 
+server_address = 'http://127.0.0.1:8000'
+
+
 @click.group()
 def files():
     pass
@@ -30,7 +33,8 @@ def encrypt_file(file, output_file):
 @click.argument('user', type=str, nargs=1)
 def get_file(file, user):
     password = click.prompt(f'Please enter {user} password', type=str, hide_input=True)
-    response = requests.get(f'http://127.0.0.1:8000/download-file/{file}/{user}')
+    # TODO: Comprobar contraseña
+    response = requests.get(f'{server_address}/download-file/{file}/{user}')
     try:
         os.mkdir(f'./files/{user}')
     except:
