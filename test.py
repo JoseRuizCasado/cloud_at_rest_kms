@@ -1,12 +1,5 @@
-import requests
+from secure_delete import secure_delete
 
 
-response = requests.get('http://127.0.0.1:8000/download-file/ejemplo.txt/Jose')
-
-print(response.content)
-
-
-
-
-else:
-print(res.status_code, res.content)
+secure_delete.secure_random_seed_init()
+secure_delete.secure_delete('./sd.txt')
