@@ -14,7 +14,7 @@ def files():
     pass
 
 
-@click.command(name='encrypt-file')
+@click.command(name='encrypt_file')
 @click.argument('file', type=str, nargs=1)
 @click.argument('username', type=str, nargs=1)
 @click.password_option(help='User password. Should not be passed as an argument, instead it will be asked before execution.')
@@ -74,7 +74,7 @@ def get_file(file, user, password, read):
                 click.echo(f'File saved to ', nl=False)
                 click.secho(f'files/{user}/{file}', fg='blue')
         else:
-            click.secho(f'File not found on cloud', fg='red')
+            click.secho(f'Seems like something went wrong! File not found.', fg='red')
     else:
         click.secho(res.text, fg='red')
 
@@ -88,14 +88,18 @@ def get_files(user, password, count):
 
     USER should be an active user in cloud system
     """
+
     res = requests.get(f'{server_address}/api-login', data={'user': user, 'pass': password})
     if res.status_code == 200:
         response = requests.get(f'{server_address}/api-get-files/{user}').content.decode()
-        json_res = json.loads(response)
-        click.secho(f'{user}', fg='white')
-        for f in json_res:
-            click.secho('|-- ', fg='white', nl=False)
-            click.secho(f'{f["filename"]}', fg='blue')
+        if response:
+            json_res = json.loads(response)
+            click.secho(f'{user}', fg='white')
+            for f in json_res:
+                click.secho('|-- ', fg='white', nl=False)
+                click.secho(f'{f["filename"]}', fg='blue')
+        else:
+            click.secho(f'Seems like something went wrong! Have you tried uploading something before?', fg='red')
 
     else:
         click.secho('Invalid User', fg='red')
