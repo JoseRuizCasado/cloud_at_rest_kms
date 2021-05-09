@@ -88,16 +88,20 @@ def get_files(user, password, count):
 
     USER should be an active user in cloud system
     """
-
     res = requests.get(f'{server_address}/api-login', data={'user': user, 'pass': password})
     if res.status_code == 200:
         response = requests.get(f'{server_address}/api-get-files/{user}').content.decode()
         if response:
             json_res = json.loads(response)
             click.secho(f'{user}', fg='white')
+            i = 0
             for f in json_res:
+                if count != -1 and count <= i:
+                    break
+
                 click.secho('|-- ', fg='white', nl=False)
                 click.secho(f'{f["filename"]}', fg='blue')
+                i += 1
         else:
             click.secho(f'Seems like something went wrong! Have you tried uploading something before?', fg='red')
 
@@ -106,8 +110,8 @@ def get_files(user, password, count):
 
 
 @click.command(name='delete_file')
-@click.argument('user', type=str, nargs=1)
 @click.argument('file', type=str, nargs=1)
+@click.argument('user', type=str, nargs=1)
 @click.password_option(help='User password. Should not be passed as an argument, instead it will be asked before execution.')
 @click.option('-l', '--local', is_flag=True, default=False, help='Keep file in local.', show_default=True)
 def delete_file(file, user, password, local):
@@ -132,7 +136,7 @@ def delete_file(file, user, password, local):
             click.secho(f'File deleted from ', nl=False)
             click.secho(f'files/{user}/{file}', fg='blue')
     else:
-        click.secho(res.text, fg='read')
+        click.secho(res.text, fg='red')
 
 
 files.add_command(get_file)
