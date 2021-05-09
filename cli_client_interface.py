@@ -26,7 +26,7 @@ def encrypt_file(file, username, password):
     USER should be an active user in cloud system"""
     res = requests.get(f'{server_address}/api-login', data={'user': username, 'pass': password})
     if res.status_code == 200:
-            res = requests.post(f'{server_address}/upload-file', files={'file': open(file, 'rb')})
+            res = requests.post(f'{server_address}/upload-file/{username}', files={'file': open(file, 'rb')})
             click.secho(f'{res.status_code}, {res.text}', fg='blue')
     else:
         click.secho(f'{res.status_code}, {res.text}', fg='red')
